@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+@theme {
+  /* ink & steel — matte gym-mat black, brushed steel surfaces */
+  --color-ink: #0b0c0e;
+  --color-steel: #16181c;
+  --color-steel-2: #1e2126;
+  --color-steel-3: #292d34;
+
+  /* chalk — warm off-white, never pure white */
+  --color-chalk: #edeae3;
+  --color-chalk-dim: #9a9c9f;
+
+  /* competition-plate colors (IPF/IWF color code), used as a real accent system */
+  --color-plate-red: #d7263d;    /* 25kg */
+  --color-plate-blue: #1e6feb;   /* 20kg */
+  --color-plate-yellow: #f2b705; /* 15kg */
+  --color-plate-green: #2e9e4f;  /* 10kg */
+
+  --font-display: "Bebas Neue", "Arial Narrow", sans-serif;
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Courier New", monospace;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-ink);
+  color: var(--color-chalk);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+::selection {
+  background: var(--color-plate-red);
+  color: var(--color-chalk);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-plate-yellow);
+  outline-offset: 2px;
+}
+
+input, select {
+  color-scheme: dark;
+}
+
+/* faint chalk-dust grain — a texture the ink black would otherwise lack */
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- motion ---- */
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes plate-drop {
+  0% { opacity: 0; transform: translateY(-14px) scale(0.4); }
+  60% { opacity: 1; transform: translateY(2px) scale(1.08); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes bar-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes dust-pop {
+  0% { opacity: 0.9; transform: scale(0.3); }
+  100% { opacity: 0; transform: scale(2.6); }
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(215, 38, 61, 0.45); }
+  100% { box-shadow: 0 0 0 10px rgba(215, 38, 61, 0); }
+}
+
+.animate-rise-in {
+  animation: rise-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-plate-drop {
+  animation: plate-drop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-bar-spin {
+  animation: bar-spin 0.9s linear infinite;
+}
+
+.animate-dust-pop {
+  animation: dust-pop 0.6s ease-out both;
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise-in,
+  .animate-plate-drop,
+  .animate-bar-spin,
+  .animate-dust-pop,
+  .animate-pulse-ring {
+    animation: none !important;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
