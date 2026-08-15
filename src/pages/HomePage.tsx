@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useWeekActivity } from '../hooks/useProgress'
 import { useDashboard } from '../hooks/useDashboard'
-import { startSession } from '../hooks/useSessions'
+import { startSession, useActiveSession } from '../hooks/useSessions'
 import { WeekStrip } from '../components/WeekStrip'
 import { MetricTile } from '../components/MetricTile'
 import { PlateSpinner } from '../components/PlateSpinner'
@@ -21,6 +21,7 @@ export function HomePage() {
   const { session, signOut } = useAuth()
   const activeDates = useWeekActivity()
   const dashboard = useDashboard()
+  const { active: activeSession } = useActiveSession()
   const navigate = useNavigate()
   const [starting, setStarting] = useState(false)
 
@@ -65,15 +66,25 @@ export function HomePage() {
             <p className="text-sm text-chalk">{daysSinceMessage(dashboard.daysSinceLast)}</p>
           </div>
 
-          {dashboard.lastRoutine && (
+          {activeSession ? (
             <button
-              onClick={continueRoutine}
-              disabled={starting}
-              className="mb-4 flex w-full items-center justify-center gap-2 rounded-xl bg-plate-red py-3.5 font-display text-lg uppercase tracking-wide text-chalk transition-transform active:scale-[0.98] disabled:opacity-60"
+              onClick={() => navigate(`/sessions/${activeSession.id}`)}
+              className="mb-4 flex w-full items-center justify-center gap-2 rounded-xl bg-plate-yellow py-3.5 font-display text-lg uppercase tracking-wide text-ink transition-transform active:scale-[0.98]"
             >
-              {starting ? <PlateSpinner className="h-4 w-4" /> : <PlayIcon className="h-4 w-4" />}
-              Continuar con {dashboard.lastRoutine.name}
+              <PlayIcon className="h-4 w-4" />
+              Reanudar {activeSession.routineName}
             </button>
+          ) : (
+            dashboard.lastRoutine && (
+              <button
+                onClick={continueRoutine}
+                disabled={starting}
+                className="mb-4 flex w-full items-center justify-center gap-2 rounded-xl bg-plate-red py-3.5 font-display text-lg uppercase tracking-wide text-chalk transition-transform active:scale-[0.98] disabled:opacity-60"
+              >
+                {starting ? <PlateSpinner className="h-4 w-4" /> : <PlayIcon className="h-4 w-4" />}
+                Continuar con {dashboard.lastRoutine.name}
+              </button>
+            )
           )}
 
           <div className="mb-4 grid grid-cols-2 gap-3">

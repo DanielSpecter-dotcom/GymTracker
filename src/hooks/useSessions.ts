@@ -23,6 +23,34 @@ export async function startSession(routineId: string, routineName: string) {
   return data
 }
 
+export type ActiveSession = { id: string; routineName: string }
+
+/** The user's in-progress (not yet finished) session, if any — there's at most one at a time. */
+export async function findActiveSession(): Promise<ActiveSession | null> {
+  const { data } = await supabase
+    .from('workout_sessions')
+    .select('id, routine_name_snapshot')
+    .is('completed_at', null)
+    .order('started_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  return data ? { id: data.id, routineName: data.routine_name_snapshot } : null
+}
+
+export function useActiveSession() {
+  const [active, setActive] = useState<ActiveSession | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    findActiveSession().then((a) => {
+      setActive(a)
+      setLoading(false)
+    })
+  }, [])
+
+  return { active, loading }
+}
+
 /** Total volume (kg × reps) of the most recent previous completed session for this routine, if any. */
 export async function fetchPreviousSessionVolume(routineId: string, excludeSessionId: string) {
   const { data: prevSession } = await supabase

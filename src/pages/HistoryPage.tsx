@@ -3,11 +3,31 @@ import { useCompletedSessions, useExerciseNames, useExerciseProgress } from '../
 import { ProgressChart, type Metric } from '../components/ProgressChart'
 import { SkeletonList } from '../components/Skeleton'
 import { ConfirmButton } from '../components/ConfirmButton'
+import { ChevronDownIcon, ChevronUpIcon } from '../components/Icon'
 
-const METRIC_TABS: { key: Metric; label: string; activeClass: string }[] = [
-  { key: 'maxWeight', label: 'Peso máximo', activeClass: 'bg-plate-red text-chalk' },
-  { key: 'oneRM', label: '1RM estimado', activeClass: 'bg-plate-green text-ink' },
-  { key: 'volume', label: 'Volumen', activeClass: 'bg-plate-blue text-chalk' },
+const METRIC_TABS: { key: Metric; label: string; activeClass: string; dot: string; blurb: string }[] = [
+  {
+    key: 'maxWeight',
+    label: 'Peso máximo',
+    activeClass: 'bg-plate-red text-chalk',
+    dot: 'bg-plate-red',
+    blurb: 'El peso más alto que levantaste en cada sesión, sin importar las reps. Mide tu pico de fuerza en el momento.',
+  },
+  {
+    key: 'oneRM',
+    label: '1RM estimado',
+    activeClass: 'bg-plate-green text-ink',
+    dot: 'bg-plate-green',
+    blurb:
+      'Una proyección de cuánto podrías levantar en una sola repetición, calculada con peso y reps (fórmula de Epley). Sirve para comparar sesiones aunque hayas variado las reps.',
+  },
+  {
+    key: 'volume',
+    label: 'Volumen',
+    activeClass: 'bg-plate-blue text-chalk',
+    dot: 'bg-plate-blue',
+    blurb: 'Peso × reps sumado de todas las series de la sesión. Mide el trabajo total, útil para ver si estás entrenando más o menos en general.',
+  },
 ]
 
 export function HistoryPage() {
@@ -17,6 +37,7 @@ export function HistoryPage() {
   const [selected, setSelected] = useState<string | null>(null)
   const [metric, setMetric] = useState<Metric>('maxWeight')
   const { points } = useExerciseProgress(selected, refreshKey)
+  const [showInfo, setShowInfo] = useState(false)
 
   function removeSession(id: string) {
     remove(id)
@@ -59,6 +80,27 @@ export function HistoryPage() {
                 ))}
               </div>
               <ProgressChart points={points} metric={metric} />
+
+              <button
+                onClick={() => setShowInfo((v) => !v)}
+                className="mt-3 flex w-full items-center justify-between text-left font-mono text-[11px] uppercase tracking-wide text-chalk-dim transition-colors hover:text-chalk"
+              >
+                Cómo interpretar estos gráficos
+                {showInfo ? <ChevronUpIcon className="h-3.5 w-3.5" /> : <ChevronDownIcon className="h-3.5 w-3.5" />}
+              </button>
+
+              {showInfo && (
+                <ul className="animate-rise-in mt-3 space-y-2.5 border-t border-dashed border-steel-3 pt-3">
+                  {METRIC_TABS.map((tab) => (
+                    <li key={tab.key} className="flex gap-2.5">
+                      <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${tab.dot}`} />
+                      <p className="text-sm text-chalk-dim">
+                        <span className="font-medium text-chalk">{tab.label}.</span> {tab.blurb}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </>
           )}
         </div>

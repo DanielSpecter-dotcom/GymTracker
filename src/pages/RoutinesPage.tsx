@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useRoutines, type Routine } from '../hooks/useRoutines'
-import { startSession } from '../hooks/useSessions'
+import { startSession, findActiveSession } from '../hooks/useSessions'
+import { useToast } from '../hooks/useToast'
 import { PlateSpinner } from '../components/PlateSpinner'
 import { SkeletonList } from '../components/Skeleton'
 import { PlayIcon, CheckIcon, XIcon } from '../components/Icon'
@@ -10,6 +11,7 @@ import { PLATE_COLORS as ACCENTS } from '../lib/plateColors'
 
 export function RoutinesPage() {
   const { routines, exerciseCounts, loading, create, remove, rename, duplicate } = useRoutines()
+  const toast = useToast()
   const navigate = useNavigate()
   const [name, setName] = useState('')
   const [starting, setStarting] = useState<string | null>(null)
@@ -26,6 +28,12 @@ export function RoutinesPage() {
   async function start(routineId: string, routineName: string) {
     setStarting(routineId)
     try {
+      const existing = await findActiveSession()
+      if (existing) {
+        toast('Ya tenés un entrenamiento en curso, te llevamos ahí.', 'success')
+        navigate(`/sessions/${existing.id}`)
+        return
+      }
       const session = await startSession(routineId, routineName)
       navigate(`/sessions/${session.id}`)
     } finally {
