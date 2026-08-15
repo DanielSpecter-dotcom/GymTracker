@@ -7,6 +7,7 @@ import { PlateSpinner } from '../components/PlateSpinner'
 import { RestTimerBar } from '../components/RestTimerBar'
 import { SkeletonList } from '../components/Skeleton'
 import { MetricTile } from '../components/MetricTile'
+import { ConfirmButton } from '../components/ConfirmButton'
 import { CheckIcon } from '../components/Icon'
 import { formatDuration, formatVolume } from '../lib/format'
 
@@ -23,7 +24,7 @@ const DUST_DOTS = [
 export function WorkoutSessionPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { session, routineExercises, sets, loading, addSet, removeSet, finish } = useSession(id!)
+  const { session, routineExercises, sets, loading, addSet, removeSet, finish, cancel } = useSession(id!)
   const lastByExercise = useLastPerformance(
     routineExercises.map((e) => e.name),
     id!,
@@ -52,6 +53,11 @@ export function WorkoutSessionPage() {
       : null
     setFinishing(false)
     setSummary({ totalVolume, durationMs, prevVolume })
+  }
+
+  async function cancelWorkout() {
+    const ok = await cancel()
+    if (ok) navigate('/')
   }
 
   if (loading || !session) {
@@ -149,7 +155,7 @@ export function WorkoutSessionPage() {
       ))}
 
       {!session.completed_at && (
-        <div className="mb-24 mt-2">
+        <div className="mb-24 mt-2 space-y-3">
           <button
             onClick={finishWorkout}
             disabled={finishing}
@@ -158,6 +164,14 @@ export function WorkoutSessionPage() {
             {finishing ? <PlateSpinner className="h-4 w-4 text-ink" /> : <CheckIcon className="h-5 w-5" />} Finalizar
             entrenamiento
           </button>
+          <ConfirmButton
+            onConfirm={cancelWorkout}
+            className="w-full text-center text-xs text-chalk-dim transition-colors hover:text-plate-red"
+            armedClassName="w-full text-center text-xs font-semibold text-plate-red"
+            confirmLabel="¿Seguro? Se borra todo lo registrado — toca para confirmar"
+          >
+            Cancelar entrenamiento
+          </ConfirmButton>
         </div>
       )}
     </div>

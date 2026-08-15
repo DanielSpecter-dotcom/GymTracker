@@ -149,7 +149,16 @@ export function useSession(sessionId: string) {
     return true
   }
 
-  return { session, routineExercises, sets, loading, addSet, removeSet, finish }
+  async function cancel() {
+    const { error } = await supabase.from('workout_sessions').delete().eq('id', sessionId)
+    if (error) {
+      toast('No se pudo cancelar el entrenamiento.')
+      return false
+    }
+    return true
+  }
+
+  return { session, routineExercises, sets, loading, addSet, removeSet, finish, cancel }
 }
 
 export type LastPerformance = { weight: number; reps: number }
