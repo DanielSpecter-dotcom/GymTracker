@@ -38,7 +38,10 @@ export function RestTimerBar({
   const ss = String(remaining % 60).padStart(2, '0')
 
   return (
-    <div className="fixed inset-x-0 bottom-[68px] z-10 mx-auto flex max-w-md items-center justify-between gap-3 border-t border-plate-yellow/30 bg-steel/95 px-4 py-2.5 backdrop-blur">
+    <div
+      className="fixed inset-x-0 z-10 mx-auto flex max-w-md items-center justify-between gap-3 border-t border-plate-yellow/30 bg-steel/95 px-4 py-2.5 backdrop-blur"
+      style={{ bottom: 'calc(68px + env(safe-area-inset-bottom))' }}
+    >
       <div className="flex items-center gap-2">
         <span className="h-2 w-2 animate-pulse-ring rounded-full bg-plate-yellow" />
         <span className="font-mono text-lg tabular-nums text-plate-yellow">
