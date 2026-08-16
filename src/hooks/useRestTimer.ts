@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { unlockAudio, playBeep } from '../lib/beep'
 
 export const REST_PRESETS = [60, 90, 120] as const
 const STORAGE_KEY = 'gymtracker:rest-duration'
@@ -19,6 +20,7 @@ export function useRestTimer() {
       if (left <= 0) {
         clearInterval(id)
         if (navigator.vibrate) navigator.vibrate([200, 100, 200])
+        playBeep()
       }
     }, 250)
     return () => clearInterval(id)
@@ -26,6 +28,7 @@ export function useRestTimer() {
   }, [remaining > 0])
 
   function start() {
+    unlockAudio()
     endAtRef.current = Date.now() + duration * 1000
     setRemaining(duration)
   }

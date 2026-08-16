@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { LastPerformance, SessionSet } from '../hooks/useSessions'
 import { PlateStack } from './PlateStack'
 import { XIcon } from './Icon'
+import { unlockAudio } from '../lib/beep'
 
 export function ExerciseSetRow({
   exerciseName,
@@ -28,6 +29,7 @@ export function ExerciseSetRow({
     const w = parseFloat(weight)
     const r = parseInt(reps, 10)
     if (Number.isNaN(w) || Number.isNaN(r)) return
+    unlockAudio()
     onAddSet(w, r)
     setWeight('')
     setReps('')
